@@ -16,7 +16,6 @@ pipeline{
             }
             steps{
                 echo 'Compiling worker app...'
-                sh 'docker --version'
                 dir('worker') {
                     sh 'mvn compile'
                 }
