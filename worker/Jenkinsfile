@@ -1,7 +1,7 @@
 pipeline{
     agent{
         docker {
-            image 'maven:3.9.8-sapmachine-21'
+            image 'maven:3.9.9-sapmachine-21'
             args '-v $HOME/.m2:/root/.m2'
         }
     }
@@ -10,13 +10,13 @@ pipeline{
         stage("build") {
             steps{
                 echo 'building worker app'
+                sh 'docker --version'
                 dir('worker') {
                     sh 'mvn compile'
                 }
             }
         }
         stage("test") {
-
             steps{
                 echo 'running tests on worker app'
                 dir('worker') {
@@ -30,6 +30,19 @@ pipeline{
                 dir('worker') {
                     sh 'mvn package -DskipTests'
                     archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+                }
+            }
+        }
+        stage('docker-package'){
+            agent any
+            steps{
+                echo'Packaging worker app with docker'
+                script{
+                    docker.withRegistry('https://index.docker.io/v1/','dockerlogin'){
+                        def workerImage = docker.build("andgomalf/worker:v${env.BUILD_ID}","./worker")
+                        workerImage.push()
+                        workerImage.push("latest")
+                    }
                 }
             }
         }
