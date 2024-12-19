@@ -60,6 +60,10 @@ pipeline{
         }
         stage('docker-package'){
             agent any
+            when{
+                branch 'master'
+                changeset '**/worker/**'
+            }
             steps{
                 echo'Packaging worker app with docker'
                 script{
@@ -76,7 +80,7 @@ pipeline{
 
     post {
         always{
-            echo 'the job is complete'
+            echo 'Building multibranch pipeline for worker is completed..'
         }
     }
 }
