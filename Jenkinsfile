@@ -184,8 +184,7 @@ pipeline {
                     sh 'sh integration_test.sh' 
                 } 
             } 
-        } 
-
+        }
 
         stage('vote-docker-package') {
             agent any
@@ -222,11 +221,12 @@ pipeline {
 
             steps {
                     echo 'Running Sonarqube Analysis..'
+                    def scannerHome = tool name: 'sonar_scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation';
                     withSonarQubeEnv('sonar-instavote') {
                     sh "${sonarpath}/bin/sonar-scanner -Dproject.settings=sonar-project.properties -Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400"
                     }
-            }
-            }
+            }   
+        }
 
 
         stage("Quality Gate") {
